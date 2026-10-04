@@ -1,6 +1,6 @@
 package structures;
 
-public final class DynamicArray {
+public final class DynamicArray implements IntSequence {
     private static final int DEFAULT_CAPACITY = 8;
 
     private int[] elements;
