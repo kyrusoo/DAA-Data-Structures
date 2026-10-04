@@ -1,6 +1,6 @@
 package structures;
 
-public interface IntSequence {
+public interface IntSequence extends InstrumentedStructure {
     void add(int value);
 
     void add(int index, int value);

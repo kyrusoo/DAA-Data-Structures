@@ -5,6 +5,7 @@ public final class DynamicArray implements IntSequence {
 
     private int[] elements;
     private int size;
+    private final OperationMetrics metrics = new OperationMetrics();
 
     public DynamicArray() {
         elements = new int[DEFAULT_CAPACITY];
@@ -21,7 +22,9 @@ public final class DynamicArray implements IntSequence {
         ensureCapacityForOneMore();
 
         for (int i = size; i > index; i--) {
+            metrics.recordStep();
             elements[i] = elements[i - 1];
+            metrics.recordMove();
         }
         elements[index] = value;
         size++;
@@ -29,10 +32,13 @@ public final class DynamicArray implements IntSequence {
 
     public int remove(int index) {
         checkElementIndex(index);
+        metrics.recordStep();
         int removed = elements[index];
 
         for (int i = index; i < size - 1; i++) {
+            metrics.recordStep();
             elements[i] = elements[i + 1];
+            metrics.recordMove();
         }
         size--;
         return removed;
@@ -40,11 +46,14 @@ public final class DynamicArray implements IntSequence {
 
     public int get(int index) {
         checkElementIndex(index);
+        metrics.recordStep();
         return elements[index];
     }
 
     public boolean contains(int value) {
         for (int i = 0; i < size; i++) {
+            metrics.recordStep();
+            metrics.recordComparison();
             if (elements[i] == value) {
                 return true;
             }
@@ -60,11 +69,23 @@ public final class DynamicArray implements IntSequence {
         return size == 0;
     }
 
+    @Override
+    public OperationMetrics metrics() {
+        return metrics;
+    }
+
+    @Override
+    public void resetMetrics() {
+        metrics.reset();
+    }
+
     private void ensureCapacityForOneMore() {
         if (size == elements.length) {
             int[] expanded = new int[elements.length * 2];
             for (int i = 0; i < size; i++) {
+                metrics.recordStep();
                 expanded[i] = elements[i];
+                metrics.recordMove();
             }
             elements = expanded;
         }

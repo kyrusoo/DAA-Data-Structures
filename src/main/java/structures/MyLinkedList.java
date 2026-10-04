@@ -4,15 +4,19 @@ public final class MyLinkedList implements IntSequence {
     private Node head;
     private Node tail;
     private int size;
+    private final OperationMetrics metrics = new OperationMetrics();
 
     public void add(int value) {
         Node node = new Node(value);
         if (tail == null) {
             head = node;
+            metrics.recordMove();
         } else {
             tail.next = node;
+            metrics.recordMove();
         }
         tail = node;
+        metrics.recordMove();
         size++;
     }
 
@@ -26,11 +30,16 @@ public final class MyLinkedList implements IntSequence {
         Node node = new Node(value);
         if (index == 0) {
             node.next = head;
+            metrics.recordMove();
             head = node;
+            metrics.recordMove();
         } else {
             Node previous = nodeAt(index - 1);
             node.next = previous.next;
+            metrics.recordStep();
+            metrics.recordMove();
             previous.next = node;
+            metrics.recordMove();
         }
         size++;
     }
@@ -41,15 +50,21 @@ public final class MyLinkedList implements IntSequence {
         if (index == 0) {
             removed = head;
             head = head.next;
+            metrics.recordStep();
+            metrics.recordMove();
             if (size == 1) {
                 tail = null;
+                metrics.recordMove();
             }
         } else {
             Node previous = nodeAt(index - 1);
             removed = previous.next;
+            metrics.recordStep();
             previous.next = removed.next;
+            metrics.recordMove();
             if (removed == tail) {
                 tail = previous;
+                metrics.recordMove();
             }
         }
         size--;
@@ -64,10 +79,12 @@ public final class MyLinkedList implements IntSequence {
     public boolean contains(int value) {
         Node current = head;
         while (current != null) {
+            metrics.recordComparison();
             if (current.value == value) {
                 return true;
             }
             current = current.next;
+            metrics.recordStep();
         }
         return false;
     }
@@ -80,10 +97,21 @@ public final class MyLinkedList implements IntSequence {
         return size == 0;
     }
 
+    @Override
+    public OperationMetrics metrics() {
+        return metrics;
+    }
+
+    @Override
+    public void resetMetrics() {
+        metrics.reset();
+    }
+
     private Node nodeAt(int index) {
         Node current = head;
         for (int i = 0; i < index; i++) {
             current = current.next;
+            metrics.recordStep();
         }
         return current;
     }
