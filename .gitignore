@@ -1,0 +1,18 @@
+# Maven build output
+/target/
+
+# IDE metadata
+/.idea/
+*.iml
+*.ipr
+*.iws
+
+# Other build tools and generated output
+/build/
+/out/
+/.gradle/
+
+# Local editor and OS files
+/.vscode/
+.DS_Store
+Thumbs.db
